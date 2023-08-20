@@ -1,0 +1,60 @@
+
+User
+--id
+--name
+--email
+--image
+--password
+--createdAt
+--updatedAt
+
+Product
+--id
+--name
+--description
+--price
+--image
+--quantity
+--createdAt
+--updatedAt
+
+Favorites
+--id
+--userId
+--productId
+--createdAt
+--updatedAt
+
+create database shop;
+
+create table users (
+    user_id serial primary key,
+    user_name varchar(255) not null,
+    email text not null unique,
+    password varchar(255) not null,
+    role varchar(255) not null,
+    image text,
+    created_at date not null,
+    updated_at date not null
+);
+
+
+create table products (
+    product_id serial primary key,
+    name text not null,
+    description text not null,
+    price int not null,
+    image text,
+    quantity int default 0,
+    created_at date not null,
+    updated_at date not null
+);
+
+create table favorites(
+    fav_id serial primary key,
+    fav_user_id int references users(user_id) not null,
+    fav_product_id int references products(product_id) not null,
+    unique_id text not null unique,
+    created_at date not null,
+    updated_at date not null
+);
