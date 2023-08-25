@@ -3,19 +3,27 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const path = require("path");
+const morgan = require("morgan");
 
 const port = 8080;
-
+console.log(path.join(__dirname, "storage"));
 const usersRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
 const productsRoute = require("./routes/productRoute");
 const favouriteRoute = require("./routes/favoriteRoute");
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static("storage"));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
+app.use(morgan("dev"));
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/products", productsRoute);

@@ -1,4 +1,5 @@
 const pool = require("../database/db");
+const permissions = require("../utils/permission");
 
 const getAllFavorites = async (req, res) => {
   try {
@@ -62,6 +63,9 @@ const userFavorite = async (req, res) => {
 
   try {
     const favorite = await pool.query(query, [id]);
+
+    permissions(req, res, favorite.rows[0].fav_user_id);
+
     res.status(200).json({ success: true, favorite: favorite.rows });
   } catch (error) {
     console.error(error);
@@ -90,6 +94,8 @@ const getFavorite = async (req, res) => {
         .json({ success: false, message: "Favorite not found" });
     }
 
+    permissions(req, res, favorite.rows[0].fav_user_id);
+
     res.status(200).json({ success: true, favorite: favorite.rows[0] });
   } catch (error) {
     console.error(error);
@@ -105,8 +111,21 @@ const deleteFavorite = async (req, res) => {
       .status(400)
       .json({ success: false, message: "Provide all credentials" });
   }
-  //check persmission
+
   try {
+    const favorite = await pool.query(
+      "select * from favorites where fav_user_id = $1",
+      [id]
+    );
+
+    if (favorite.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Favorite not found" });
+    }
+
+    permissions(req, res, favorite.rows[0].fav_user_id);
+
     await pool.query("delete from favorites where user_id = $1", [id]);
     res.status(200).json({ success: true, message: "Delete a favorite" });
   } catch (error) {

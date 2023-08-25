@@ -18,7 +18,7 @@ const isAuth = (req, res, next) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ success: false, message: "Authentication invalid" });
+      .json({ success: false, message: "An error occurred" });
   }
 };
 
