@@ -3,11 +3,10 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
-const path = require("path");
 const morgan = require("morgan");
 
 const port = 8080;
-console.log(path.join(__dirname, "storage"));
+
 const usersRoute = require("./routes/userRoute");
 const authRoute = require("./routes/authRoute");
 const productsRoute = require("./routes/productRoute");

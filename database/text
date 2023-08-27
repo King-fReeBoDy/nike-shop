@@ -32,12 +32,11 @@ create table users (
     user_name varchar(255) not null,
     email text not null unique,
     password varchar(255) not null,
-    role varchar(255) not null,
+    role varchar(255) default "user",
     image text,
     created_at date not null,
     updated_at date not null
 );
-
 
 create table products (
     product_id serial primary key,
@@ -45,7 +44,7 @@ create table products (
     description text not null,
     price int not null,
     image text,
-    quantity int default 0,
+    quantity text default "0",
     created_at date not null,
     updated_at date not null
 );
@@ -54,7 +53,6 @@ create table favorites(
     fav_id serial primary key,
     fav_user_id int references users(user_id) not null,
     fav_product_id int references products(product_id) not null,
-    unique_id text not null unique,
     created_at date not null,
     updated_at date not null
 );

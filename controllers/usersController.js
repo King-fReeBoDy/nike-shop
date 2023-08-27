@@ -1,4 +1,5 @@
 const pool = require("../database/db");
+const { checkPermissions } = require("../middleware/isAuth");
 
 const getAllUsers = async (req, res) => {
   const users = await pool.query("select * from users");
@@ -7,8 +8,11 @@ const getAllUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { id } = req.params;
-  //check permission
+
   const user = await pool.query("select * from users where user_id = $1", [id]);
+
+  checkPermissions(res, req, user.rows[0].user_id);
+
   res.status(200).json({ success: true, user: user.rows[0] });
 };
 
@@ -23,7 +27,6 @@ const updateUser = async (req, res) => {
         .json({ success: false, message: "Provide all credentials" });
     }
 
-    //check permission
     const alreadyExistingEmail = await pool.query(
       "select * from users where user_id = $1",
       [id]
@@ -34,6 +37,8 @@ const updateUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User does not exits" });
     }
+
+    checkPermissions(res, req, alreadyExistingEmail.rows[0].user_id);
 
     await pool.query(
       "update users set email = $1, user_name =$2 where user_id = $3",
@@ -50,8 +55,11 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const { id } = req.params;
-  //check permission
+
   const user = await pool.query("delete from users where user_id = $1", [id]);
+
+  checkPermissions(res, req, user.rows[0].user_id);
+
   res.status(200).json({ success: true, message: "User deleted" });
 };
 
