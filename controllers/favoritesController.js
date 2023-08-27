@@ -13,17 +13,17 @@ const getAllFavorites = async (req, res) => {
 };
 
 const createFavorite = async (req, res) => {
-  const { userId, productId, unique_id } = req.body;
+  const { userId, productId } = req.body;
 
-  if (!userId || !productId || !unique_id) {
+  if (!userId || !productId) {
     return res
       .status(400)
       .json({ success: false, message: "Provide all credentials" });
   }
 
   const favoriteAlreadyExist = await pool.query(
-    "select * from favorites where unique_id = $1",
-    [unique_id]
+    "select * from favorites where product_id = $1 and user_id = $2",
+    [productId, userId]
   );
 
   if (favoriteAlreadyExist.rows.length > 0) {
@@ -32,8 +32,8 @@ const createFavorite = async (req, res) => {
 
   try {
     await pool.query(
-      "insert into favorites (user_id,product_id,unique_id,createdAt,updatedAt) values($1,$2,$3,$4)",
-      [userId, productId, unique_id, new Date(), new Date()]
+      "insert into favorites (user_id,product_id,createdAt,updatedAt) values($1,$2,$3,$4)",
+      [userId, productId, new Date(), new Date()]
     );
     res.status(200).json({ success: true, message: "Favorite added" });
   } catch (error) {
@@ -84,7 +84,7 @@ const getFavorite = async (req, res) => {
 
   try {
     const favorite = await pool.query(
-      "select * from favorites where user_id = $1",
+      "select * from favorites where fav_user_id = $1",
       [id]
     );
 
@@ -104,9 +104,9 @@ const getFavorite = async (req, res) => {
 };
 
 const deleteFavorite = async (req, res) => {
-  const { id } = req.params;
+  const { productId, userId } = req.params;
 
-  if (!id) {
+  if (!productId || !userId) {
     res
       .status(400)
       .json({ success: false, message: "Provide all credentials" });
@@ -114,8 +114,8 @@ const deleteFavorite = async (req, res) => {
 
   try {
     const favorite = await pool.query(
-      "select * from favorites where fav_user_id = $1",
-      [id]
+      "select * from favorites where product_id = $1 and user_id = $2",
+      [productId, userId]
     );
 
     if (favorite.rows.length === 0) {
@@ -126,7 +126,7 @@ const deleteFavorite = async (req, res) => {
 
     permissions(req, res, favorite.rows[0].fav_user_id);
 
-    await pool.query("delete from favorites where user_id = $1", [id]);
+    await pool.query("delete from favorites where fav_user_id = $1", [userId]);
     res.status(200).json({ success: true, message: "Delete a favorite" });
   } catch (error) {
     console.log(error);
