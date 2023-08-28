@@ -23,7 +23,6 @@ const sendRefreshToken = (res, token) => {
 
 const createTokenUser = (user) => {
   return {
-    username: user.rows[0].user_name,
     email: user.rows[0].email,
     img: user.rows[0].image,
     role: user.rows[0].role,

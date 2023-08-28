@@ -42,14 +42,14 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { email, password, role } = req.body;
   let img;
   if (req.files && req.files.length > 0) {
     img = req.files[0].originalname;
   }
 
   try {
-    if (!username || !email || !password || !role) {
+    if (!email || !password || !role) {
       return res
         .status(400)
         .json({ success: false, message: "Provide all credentials" });
@@ -68,8 +68,8 @@ const register = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "insert into users (user_name,email,role,password,image, created_at, updated_at) values($1,$2,$3,$4,$5,$6,$7)",
-      [username, email, role, hashPassword, img, new Date(), new Date()]
+      "insert into users (email,role,password,image, created_at, updated_at) values($1,$2,$3,$4,$5,$6)",
+      [email, role, hashPassword, img, new Date(), new Date()]
     );
     res.status(200).json({ success: true, message: "Register successful" });
   } catch (error) {
